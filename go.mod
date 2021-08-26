@@ -1,4 +1,4 @@
-module github.com/LeoMarche/block-cast
+module github.com/LeoMarche/blocast
 
 go 1.15
 

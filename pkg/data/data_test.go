@@ -1,7 +1,7 @@
-package main
+package data
 
 import (
-	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,46 +14,51 @@ import (
 var TEST_FOLDER = "tests"
 var TEST_DATA = "testData"
 
-func writeFile(path string) {
-	f, err := os.Create(path)
-
+func copy(src, dst string) error {
+	in, err := os.Open(src)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	defer in.Close()
 
-	defer f.Close()
-
-	_, err2 := f.WriteString("falcon\n")
-
-	if err2 != nil {
-		log.Fatal(err2)
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
 	}
+	defer out.Close()
 
-	fmt.Println("done")
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
 
 func TestFolder(t *testing.T) {
 
 	folderA := filepath.Join(TEST_FOLDER, "A")
 	folderB := filepath.Join(TEST_FOLDER, "B")
+	refFile := filepath.Join(TEST_DATA, "fileContentRef.txt")
+	testFile := filepath.Join(folderA, "muststay.txt")
 
 	os.MkdirAll(folderA, os.ModePerm)
-	writeFile(filepath.Join(folderA, "muststay.txt"))
+	defer os.RemoveAll(TEST_FOLDER)
+	err := copy(refFile, testFile)
+	assert.NoErrorf(t, err, "Copying ref file to folder %s triggers an error", folderA)
 
 	var foldersToCheck = []string{folderA, folderB}
 
-	initializeFolders(foldersToCheck)
+	InitializeFolders(foldersToCheck)
 
 	assert.DirExistsf(t, folderA, "Directory %s isn't conserved", folderA)
 	assert.DirExistsf(t, folderB, "Directory %s isn't created", folderB)
-	f1, err1 := ioutil.ReadFile(filepath.Join(folderA, "muststay.txt"))
+	f1, err1 := ioutil.ReadFile(testFile)
 	if err1 != nil {
 		log.Fatal(err1)
 	}
-	f2, err2 := ioutil.ReadFile(filepath.Join(TEST_DATA, "fileContentRef.txt"))
+	f2, err2 := ioutil.ReadFile(refFile)
 	if err2 != nil {
 		log.Fatal(err2)
 	}
 	assert.Equalf(t, f2, f1, "Folder %s content is changed", folderA)
-	os.RemoveAll(TEST_FOLDER)
 }
