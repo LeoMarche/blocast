@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/LeoMarche/blocast/pkg/data"
-	"github.com/LeoMarche/blocast/pkg/exchange"
 	"github.com/LeoMarche/blocast/pkg/key"
 )
 
@@ -32,5 +31,4 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	exchange.Exchange()
 }
