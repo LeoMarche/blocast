@@ -34,6 +34,28 @@ func copy(src, dst string) error {
 	return out.Close()
 }
 
+func TestPathExists(t *testing.T) {
+
+	type testCase struct {
+		I string
+		R bool
+		E bool
+	}
+
+	var tests = []testCase{
+		{TEST_DATA, true, false},
+		{filepath.Join(TEST_DATA, "fileContentRef.txt"), true, false},
+		{TEST_FOLDER, false, false},
+		{"\000x", false, true}}
+
+	for _, v := range tests {
+		R, E := pathExists(v.I)
+		assert.Equalf(t, v.R, R, "Results does not match on value %s", v.I)
+		assert.Equalf(t, E != nil, v.E, "Errors does not match on value %s", v.I)
+	}
+
+}
+
 func TestFolder(t *testing.T) {
 
 	folderA := filepath.Join(TEST_FOLDER, "A")
