@@ -11,6 +11,16 @@ import (
 	"encoding/gob"
 )
 
+func serializeStruct(v interface{}) ([]byte, error) {
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	err := enc.Encode(v)
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
 //GenerateKeys is a function used to generate rsa private and public keys
 //with a given size
 func GenerateKeys(keySize int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
@@ -25,16 +35,14 @@ func GenerateKeys(keySize int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 func SignStruct(v interface{}, privKey *rsa.PrivateKey) ([]byte, error) {
 
 	//Serialization
-	var b bytes.Buffer
-	enc := gob.NewEncoder(&b)
-	err := enc.Encode(v)
+	b, err := serializeStruct(v)
 	if err != nil {
 		return nil, err
 	}
 
 	//Hash Digest
 	h := sha512.New()
-	_, err = h.Write(b.Bytes())
+	_, err = h.Write(b)
 	if err != nil {
 		return nil, err
 	}
@@ -45,17 +53,16 @@ func SignStruct(v interface{}, privKey *rsa.PrivateKey) ([]byte, error) {
 }
 
 func VerifyStruct(v interface{}, pubKey *rsa.PublicKey, signature []byte) (bool, error) {
+
 	//Serialization
-	var b bytes.Buffer
-	enc := gob.NewEncoder(&b)
-	err := enc.Encode(v)
+	b, err := serializeStruct(v)
 	if err != nil {
 		return false, err
 	}
 
 	//Hash Digest
 	h := sha512.New()
-	_, err = h.Write(b.Bytes())
+	_, err = h.Write(b)
 	if err != nil {
 		return false, err
 	}
@@ -67,4 +74,34 @@ func VerifyStruct(v interface{}, pubKey *rsa.PublicKey, signature []byte) (bool,
 		return false, nil
 	}
 	return true, nil
+}
+
+//Transaction contains the informations relative to
+//a transaction
+type Transaction struct {
+	PublicKey *rsa.PublicKey
+	Object    string
+	Amount    int
+}
+
+func (t *Transaction) Sign(privKey *rsa.PrivateKey) (*SignedTransaction, error) {
+	sig, err := SignStruct(t, privKey)
+	if err != nil {
+		return nil, err
+	}
+	st := SignedTransaction{
+		T:   *t,
+		sig: sig,
+	}
+	return &st, nil
+}
+
+//SignedTransaction holds a transaction and its signature
+type SignedTransaction struct {
+	T   Transaction
+	sig []byte
+}
+
+func (st *SignedTransaction) Serialize() ([]byte, error) {
+	return serializeStruct(st)
 }
