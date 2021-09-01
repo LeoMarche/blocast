@@ -49,7 +49,7 @@ func TestPathExists(t *testing.T) {
 		{"\000x", false, true}}
 
 	for _, v := range tests {
-		R, E := pathExists(v.I)
+		R, E := PathExists(v.I)
 		assert.Equalf(t, v.R, R, "Results does not match on value %s", v.I)
 		assert.Equalf(t, E != nil, v.E, "Errors does not match on value %s", v.I)
 	}

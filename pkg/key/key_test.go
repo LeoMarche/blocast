@@ -3,10 +3,28 @@ package key
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+var TEST_DIR = "test"
+
+func TestStoreRetrieve(t *testing.T) {
+	os.MkdirAll(TEST_DIR, os.ModePerm)
+	defer os.RemoveAll(TEST_DIR)
+	privFile := path.Join(TEST_DIR, "priv.pem")
+	pubFile := path.Join(TEST_DIR, "pub.pem")
+	priv, pub, _ := GenerateKeys(2048)
+
+	StoreKeys(priv, pub, privFile, pubFile)
+	priv2, pub2, _ := RetrieveKeys(privFile, pubFile)
+
+	assert.Equalf(t, priv, priv2, "Bad private key : %v instead of %v", priv2, priv)
+	assert.Equalf(t, pub, pub2, "Bad public key : %v instead of %v", pub2, pub)
+}
 
 func TestSignVerify(t *testing.T) {
 	type t1 struct {

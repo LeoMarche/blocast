@@ -3,7 +3,7 @@ package data
 import "os"
 
 //pathExists returns whether the given file or directory exists
-func pathExists(path string) (bool, error) {
+func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true, nil
@@ -15,7 +15,7 @@ func pathExists(path string) (bool, error) {
 }
 
 func initializeFolder(folderPath string) error {
-	ex, err := pathExists(folderPath)
+	ex, err := PathExists(folderPath)
 	if err != nil {
 		return err
 	}
