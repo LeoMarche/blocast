@@ -10,7 +10,7 @@ import (
 func TestInitialize(t *testing.T) {
 
 	type test struct {
-		IPListen    string
+		IPInit      string
 		IPType      int
 		IPServ      string
 		ShouldError bool
@@ -29,9 +29,9 @@ func TestInitialize(t *testing.T) {
 
 		go func() {
 			if v.IPType == 4 {
-				DEFAULT_IPV4 = v.IPListen
+				DEFAULT_IPV4 = v.IPInit
 			} else if v.IPType == 6 {
-				DEFAULT_IPV6 = v.IPListen
+				DEFAULT_IPV6 = v.IPInit
 			}
 			err := InitializeList()
 			if v.ShouldError {
@@ -47,7 +47,7 @@ func TestInitialize(t *testing.T) {
 		} else {
 			conn, err := l.Accept()
 			assert.NoError(t, err)
-			assert.NotEmpty(t, CONN_LIST)
+			assert.NotEmptyf(t, CONN_LIST, "Should not be empty for ip: %s", v.IPInit)
 			conn.Close()
 		}
 		l.Close()
