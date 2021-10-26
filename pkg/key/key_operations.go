@@ -82,6 +82,7 @@ type Transaction struct {
 	PublicKey *rsa.PublicKey
 	Object    string
 	Amount    int
+	ID        int
 }
 
 func (t *Transaction) Sign(privKey *rsa.PrivateKey) (*SignedTransaction, error) {

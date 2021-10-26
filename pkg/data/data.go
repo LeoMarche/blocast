@@ -1,6 +1,8 @@
 package data
 
-import "os"
+import (
+	"os"
+)
 
 //pathExists returns whether the given file or directory exists
 func PathExists(path string) (bool, error) {

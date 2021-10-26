@@ -17,10 +17,10 @@ func TestInitialize(t *testing.T) {
 		IsEmpty     bool
 	}
 
-	t1 := test{DEFAULT_IPV4, 4, DEFAULT_IPV4, false, false}
-	t2 := test{DEFAULT_IPV6, 6, DEFAULT_IPV6, false, false}
-	t3 := test{"10.10.10.10", 4, DEFAULT_IPV4, true, true}
-	t4 := test{"[::2]", 6, DEFAULT_IPV6, true, true}
+	t1 := test{"127.0.0.1", 4, "127.0.0.1", false, false}
+	t2 := test{"[::1]", 6, "[::1]", false, false}
+	t3 := test{"10.10.10.10", 4, "127.0.0.1", true, true}
+	t4 := test{"[::2]", 6, "[::1]", true, true}
 
 	tests := []test{t1, t2, t3, t4}
 
